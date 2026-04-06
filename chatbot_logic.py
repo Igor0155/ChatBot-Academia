@@ -10,6 +10,10 @@ nltk.download('stopwords')
 
 class AcademiaBot:
     def __init__(self):
+
+        # Armazena o que o bot perguntou por último
+        self.contexto = None
+
          # Intent -> (Keywords, Response)
         self.conhecimento = {
             "saudacao": {
@@ -17,12 +21,19 @@ class AcademiaBot:
                 "resposta": "Olá! Sou seu assistente fitness. Para começarmos, você busca hipertrofia, emagrecimento ou apenas manter a saúde?"
             },
             "emagrecimento": {
-                "keywords": ["emagrecer", "perder peso", "queimar gordura", "secar", "dieta"],
-                "resposta": "Focar em déficit calórico e cardio é essencial. Você prefere fazer exercícios aeróbicos antes ou depois da musculação?"
+                "keywords": ["emagrecer", "perder peso", "queimar gordura", "secar", "dieta", "emagrecimento"],
+                "resposta": "Focar em déficit calórico e cardio é essencial. Você prefere fazer exercícios aeróbicos antes ou depois da musculação?",
+                "proximo_passo": "esperando_cardio"
+            },
+            "cardio_sequencia": {
+                "keywords": ["antes", "depois", "durante"],
+                "resposta": "Boa escolha! Fazer cardio depois preserva seu estoque de glicogênio para o treino de força. Você já faz algum tipo de hiit ou prefere caminhada na esteira?",
+                "proximo_passo": "esperando_tipo_cardio"
             },
             "hipertrofia": {
-                "keywords": ["ganhar musculo", "hipertrofia", "crescer", "ficar forte", "massa muscular"],
-                "resposta": "Para ganhar massa, o descanso é tão importante quanto o treino. Você costuma dormir pelo menos 7 horas por noite?"
+                "keywords": ["ganhar musculo", "hipertrofia", "ganhar", "musculo", "crescer", "ficar forte", "massa muscular"],
+                "resposta": "Para ganhar massa, o descanso é tão importante quanto o treino. Você costuma dormir pelo menos 7 horas por noite?",
+                "proximo_passo": "esperando_proteina"
             },
             "treino_peito": {
                 "keywords": ["peito", "supino", "peitoral"],
@@ -98,15 +109,35 @@ class AcademiaBot:
     def processar_texto(self, texto):
         # NLTK: Tokenização e Limpeza
         tokens = word_tokenize(texto.lower())
-        stop_words = set(stopwords.words('portuguese'))
-        palavras_limpas = [w for w in tokens if w not in stop_words and w not in string.punctuation]
-        return palavras_limpas
+        # stop_words = set(stopwords.words('portuguese'))
+        return [w for w in tokens if w not in string.punctuation]
 
     def gerar_resposta(self, mensagem_usuario):
         palavras = self.processar_texto(mensagem_usuario)
         
+        # Prioridade total ao contexto atual
+        if self.contexto == "esperando_cardio":
+            if "depois" in palavras or "pos" in palavras:
+                self.contexto = "esperando_tipo_cardio"
+                return "Excelente! Deixar o cardio para o final garante que você tenha energia máxima para os pesos. Você gosta de correr ou prefere a escada?"
+            elif "antes" in palavras or "pre" in palavras:
+                self.contexto = "esperando_tipo_cardio"
+                return "Entendi! Um cardio leve antes serve como aquecimento. Mas cuidado para não cansar o músculo principal. Você prefere esteira ou bicicleta?"
+
+        if self.contexto == "esperando_proteina":
+            # Verificamos palavras positivas ou negativas
+            if any(w in palavras for w in ["sim", "bato", "faço", "faco", "durmo", "sim"]):
+                self.contexto = None # Reseta o contexto após concluir o fluxo
+                return "Perfeito! A constância no descanso e na dieta é o segredo. Você toma whey protein ou consegue bater a meta só com comida sólida?"
+            elif any(w in palavras for w in ["não", "nao", "pouco", "dificuldade"]):
+                self.contexto = None
+                return "Muitos têm essa dificuldade! O sono regula hormônios como a grelina. Já pensou em ajustar sua rotina para dormir 30min a mais?"
+
+        # --- LÓGICA DE PALAVRAS-CHAVE (Se não houver contexto ou se o usuário mudar de assunto) ---
         for intent, dados in self.conhecimento.items():
             if any(key in palavras for key in dados["keywords"]):
+                self.contexto = dados.get("proximo_passo") # Salva o novo contexto
                 return dados["resposta"]
         
-        return "Interessante! Não tenho certeza se entendi tudo, mas adoraria saber mais. Você poderia detalhar como é sua rotina atual de exercícios?"
+        # Fallback
+        return "Interessante! Não tenho certeza se entendi, mas adoraria saber mais. Você poderia detalhar como é sua rotina atual de exercícios?"
