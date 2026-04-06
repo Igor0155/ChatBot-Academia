@@ -1,0 +1,134 @@
+:root {
+  --bg: #0d161b;
+  --panel: #1f292f;
+  --text: #e4f5ff;
+  --accent: rgb(255, 179, 0);
+  --accent-hover: #ff9510;
+  --border: #37444d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: url("academia.jpg") center/cover no-repeat fixed;
+  color: var(--text);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-shell {
+  width: min(960px, calc(100vw - 1.5rem));
+  height: min(760px, calc(100vh - 1.5rem));
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+.app-header {
+  padding: 1.2rem 1.3rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.app-header h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.45rem;
+}
+
+.app-header p {
+  margin: 0;
+  color: #b8c6e0;
+  font-size: 0.95rem;
+}
+
+.chat-container {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.message {
+  max-width: 82%;
+  padding: 0.75rem 0.95rem;
+  border-radius: 13px;
+  font-size: 0.99rem;
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+.message.user {
+  align-self: flex-end;
+  background: linear-gradient(135deg, #4f7ffc, #2f5fdb);
+  color: white;
+}
+
+.message.bot {
+  align-self: flex-start;
+  background: #223555;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.chat-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.6rem;
+  padding: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(19, 26, 42, 0.8);
+}
+
+.chat-form input {
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  padding: 0.7rem 0.9rem;
+  outline: none;
+  background: #0f1728;
+  color: var(--text);
+}
+
+.chat-form input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(63, 140, 255, 0.22);
+}
+
+.chat-form button {
+  border: none;
+  border-radius: 8px;
+  background: var(--accent);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.7rem 1rem;
+}
+
+.chat-form button:hover {
+  background: var(--accent-hover);
+}
+
+@media (max-width: 520px) {
+  .app-shell {
+    height: 100vh;
+    border-radius: 0;
+  }
+
+  .app-header h1 {
+    font-size: 1.2rem;
+  }
+
+  .chat-form {
+    padding: 0.7rem;
+  }
+}
