@@ -6,13 +6,13 @@ const botTypingDelay = 700;
 
 function getDateTimeString() {
   const now = new Date();
-  return now.toLocaleString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit'
+  return now.toLocaleString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
   });
 }
 
@@ -33,11 +33,19 @@ function botReply(userText) {
 
   if (!lowercase) return "Desculpe, não entendi. Pode repetir?";
 
-  if (lowercase.includes("olá") || lowercase.includes("oi") || lowercase.includes("bom dia")) {
+  if (
+    lowercase.includes("olá") ||
+    lowercase.includes("oi") ||
+    lowercase.includes("bom dia")
+  ) {
     return "Olá! Pronto para treinar hoje? Posso sugerir exercícios, metas e dicas de recuperação.";
   }
 
-  if (lowercase.includes("ajuda") || lowercase.includes("como") || lowercase.includes("o que")) {
+  if (
+    lowercase.includes("ajuda") ||
+    lowercase.includes("como") ||
+    lowercase.includes("o que")
+  ) {
     return "Estou aqui para ajudar no seu plano de treino. Pergunte sobre séries, alimentação ou motivação.";
   }
 
@@ -53,19 +61,31 @@ chatForm.addEventListener("submit", async (evt) => {
   const text = messageInput.value.trim();
   if (!text) return;
 
+  // Mostra mensagem do usuário
   addMessageToBoard(text, "user");
   messageInput.value = "";
-  messageInput.focus();
 
+  // Mostra "Digitando..."
   const typingMessage = addMessageToBoard("Digitando...", "bot");
   await new Promise((resolve) => setTimeout(resolve, botTypingDelay));
 
-  if (typingMessage && typingMessage.parentNode) {
-    typingMessage.remove();
-  }
+  try {
+    // Chamada AJAX para o Flask
+    const response = await fetch("/get_response", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text }),
+    });
 
-  const answer = botReply(text);
-  addMessageToBoard(answer, "bot");
+    const data = await response.json();
+
+    // Remove "Digitando" e exibe resposta real
+    typingMessage.remove();
+    addMessageToBoard(data.reply, "bot");
+  } catch (error) {
+    typingMessage.remove();
+    addMessageToBoard("Erro ao conectar com o servidor.", "bot");
+  }
 });
 
 messageInput.focus();
