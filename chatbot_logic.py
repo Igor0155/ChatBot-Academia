@@ -55,7 +55,7 @@ class AcademiaBot:
                 "proximo_passo": "esperando_experiencia_saude"
             },
             "tchau": {
-                "keywords": ["tchau", "sair", "encerrar", "obrigado", "valeu", "flw"],
+                "keywords": ["tchau", "sair", "encerrar", "obrigado", "valeu", "flw", "adeus"],
                 "resposta": "Bom treino e foco na missão! Posso te ajudar com mais alguma dúvida antes de ir?"
             }
         }
