@@ -10,14 +10,13 @@ nltk.download('stopwords')
 
 class AcademiaBot:
     def __init__(self):
-
-        # Armazena o que o bot perguntou por último
-        self.contexto = None
-
-         # Intent -> (Keywords, Response)
+        # Memória de curto prazo do bot
+        self.contexto = None 
+        
+        # Base de Conhecimento Inicial (Gatilhos)
         self.conhecimento = {
             "saudacao": {
-                "keywords": ["ola", "olá", "oi", "bom dia", "boa tarde", "boa noite", "salve",  "tudo bem" , "tudo bem?"],
+                "keywords": ["ola", "olá", "oi", "bom dia", "boa tarde", "boa noite", "salve"],
                 "resposta": "Olá! Sou seu assistente fitness. Para começarmos, você busca hipertrofia, emagrecimento ou apenas manter a saúde?"
             },
             "emagrecimento": {
@@ -25,119 +24,117 @@ class AcademiaBot:
                 "resposta": "Focar em déficit calórico e cardio é essencial. Você prefere fazer exercícios aeróbicos antes ou depois da musculação?",
                 "proximo_passo": "esperando_cardio"
             },
-            "cardio_sequencia": {
-                "keywords": ["antes", "depois", "durante"],
-                "resposta": "Boa escolha! Fazer cardio depois preserva seu estoque de glicogênio para o treino de força. Você já faz algum tipo de hiit ou prefere caminhada na esteira?",
-                "proximo_passo": "esperando_tipo_cardio"
-            },
             "hipertrofia": {
                 "keywords": ["ganhar musculo", "hipertrofia", "ganhar", "musculo", "crescer", "ficar forte", "massa muscular"],
-                "resposta": "Para ganhar massa, o descanso é tão importante quanto o treino. Você costuma dormir pelo menos 7 horas por noite?",
-                "proximo_passo": "esperando_proteina"
-            },
-            "treino_peito": {
-                "keywords": ["peito", "supino", "peitoral"],
-                "resposta": "O supino reto é o rei, mas o inclinado ajuda na estética superior. Qual desses você sente mais dificuldade em executar?"
-            },
-            "suplemento": {
-                "keywords": ["whey", "creatina", "pre-treino", "suplemento"],
-                "resposta": "Creatina é o suplemento com mais base científica para força. Você já faz uso de algum suplemento ou prefere focar 100% na dieta?"
-            },
-            "dor_muscular": {
-                "keywords": ["dor", "dolorido", "machucado", "lesao"],
-                "resposta": "Dor tardia é normal, mas dor articular é um sinal de alerta. Essa dor que você sente é no músculo ou na articulação?"
-            },
-            "perna": {
-                "keywords": ["perna", "agachamento", "legpress", "quadriceps"],
-                "resposta": "Treino de pernas eleva muito a testosterona natural. Você prefere agachamento livre ou máquinas como o Leg Press?"
-            },
-            "costas": {
-                "keywords": ["costas", "dorsal", "puxada", "remada"],
-                "resposta": "Para costas largas, as puxadas são essenciais. Você já consegue fazer barra fixa ou prefere usar o Pulley?"
-            },
-            "braco": {
-                "keywords": ["braço", "biceps", "triceps", "muque"],
-                "resposta": "O tríceps corresponde a 2/3 do volume do braço! Sabia disso? Quer uma dica de exercício para tríceps ou para bíceps?"
-            },
-            "cardio": {
-                "keywords": ["cardio", "esteira", "correr", "bicicleta", "caminhada"],
-                "resposta": "O cardio melhora muito seu fôlego na musculação. Você prefere alta intensidade (HIIT) ou uma caminhada constante?"
-            },
-            "alimentacao": {
-                "keywords": ["comer", "comida", "proteina", "ovo", "frango", "carboidrato"],
-                "resposta": "A dieta é 70% do resultado. Você costuma preparar suas marmitas ou acaba comendo fora com frequência?"
+                "resposta": "Para ganhar massa, o descanso e a proteína são vitais. Você costuma dormir pelo menos 7 horas por noite?",
+                "proximo_passo": "esperando_sono"
             },
             "motivacao": {
-                "keywords": ["desanimado", "preguica", "desistindo", "cansado"],
-                "resposta": "O resultado vem da disciplina, não da motivação. Que tal um treino mais curto hoje só para não perder o ritmo?"
+                "keywords": ["desanimado", "preguica", "desistindo", "cansado", "desanimando", "desânimo"],
+                "resposta": "O resultado vem da disciplina, não da motivação. Que tal um treino mais curto hoje só para não perder o ritmo? Topa tentar?",
+                "proximo_passo": "esperando_confirmacao_treino"
             },
-            "abdominal": {
-                "keywords": ["abdômen", "barriga", "abdominal", "prancha"],
-                "resposta": "Abdominal fortalece o core, mas a definição vem da dieta. Você treina abdômen todo dia ou dia sim, dia não?"
+            "suplemento": {
+                "keywords": ["whey", "creatina", "pre-treino", "suplemento", "tomar"],
+                "resposta": "Suplementos ajudam, mas a base é a dieta. Você já faz uso de creatina ou whey protein?",
+                "proximo_passo": "esperando_detalhe_suplemento"
             },
-            "alongamento": {
-                "keywords": ["alongar", "alongamento", "flexibilidade", "travar"],
-                "resposta": "Alongar melhora a amplitude do movimento e evita lesões. Você faz alongamento antes ou depois de treinar?"
+            "dor_muscular": {
+                "keywords": ["dor", "dolorido", "machucado", "lesao", "doendo"],
+                "resposta": "Dor tardia é normal, mas dor articular é um sinal de alerta. Essa dor que você sente é no músculo ou na articulação?",
+                "proximo_passo": "esperando_tipo_dor"
             },
-            "ombro": {
-                "keywords": ["ombro", "deltoide", "desenvolvimento"],
-                "resposta": "Ombros fortes dão o aspecto de 'V' no corpo. Você foca mais em elevação lateral ou desenvolvimento com halteres?"
+            "alimentacao": {
+                "keywords": ["comer", "comida", "proteina", "ovo", "frango", "carboidrato", "dieta"],
+                "resposta": "A dieta é 70% do resultado. Você costuma preparar suas marmitas ou acaba comendo fora com frequência?",
+                "proximo_passo": "esperando_marmita"
             },
-            "creatina": {
-                "keywords": ["creatina", "tomar", "dosagem"],
-                "resposta": "A creatina deve ser tomada todos os dias, até nos dias de descanso. Você já sabe qual a dose ideal para o seu peso?"
-            },
-            "jejum": {
-                "keywords": ["jejum", "fome", "sem comer"],
-                "resposta": "Treinar em jejum funciona para alguns, mas pode causar tontura em outros. Você já tentou treinar sem comer?"
-            },
-            "horario": {
-                "keywords": ["manhã", "noite", "tarde", "melhor horario"],
-                "resposta": "O melhor horário é aquele em que você consegue ser constante. Você se sente com mais energia ao acordar ou no fim do dia?"
-            },
-            "tenis": {
-                "keywords": ["tênis", "sapato", "calçado"],
-                "resposta": "Para treinos de perna, o ideal é um tênis de solado reto. O seu tênis atual é de corrida ou de solado reto?"
+            "manter_saude": {
+                "keywords": ["manter", "saude", "saúde", "bem estar", "qualidade de vida", "viver bem"],
+                "resposta": "Excelente objetivo! A longevidade vem do equilíbrio. Você já pratica alguma atividade física regularmente ou está começando agora?",
+                "proximo_passo": "esperando_experiencia_saude"
             },
             "tchau": {
-                "keywords": ["tchau", "sair", "encerrar", "obrigado", "valeu"],
-                "resposta": "Bom treino e foco na missão! Posso te ajudar com mais alguma dúvida sobre exercícios ou nutrição antes de ir?"
+                "keywords": ["tchau", "sair", "encerrar", "obrigado", "valeu", "flw"],
+                "resposta": "Bom treino e foco na missão! Posso te ajudar com mais alguma dúvida antes de ir?"
             }
-            
         }
 
     def processar_texto(self, texto):
-        # NLTK: Tokenização e Limpeza
+        # Tokenização via NLTK (Não removemos stopwords para manter "sim", "não", "antes", "depois")
         tokens = word_tokenize(texto.lower())
-        # stop_words = set(stopwords.words('portuguese'))
         return [w for w in tokens if w not in string.punctuation]
 
     def gerar_resposta(self, mensagem_usuario):
         palavras = self.processar_texto(mensagem_usuario)
         
-        # Prioridade total ao contexto atual
+        # --- GERENCIADOR DE CONTEXTO (ÁRVORE DE DECISÃO) ---
+        
+        # Fluxo de Emagrecimento
         if self.contexto == "esperando_cardio":
-            if "depois" in palavras or "pos" in palavras:
+            if any(w in palavras for w in ["depois", "pos", "pós"]):
                 self.contexto = "esperando_tipo_cardio"
-                return "Excelente! Deixar o cardio para o final garante que você tenha energia máxima para os pesos. Você gosta de correr ou prefere a escada?"
-            elif "antes" in palavras or "pre" in palavras:
-                self.contexto = "esperando_tipo_cardio"
-                return "Entendi! Um cardio leve antes serve como aquecimento. Mas cuidado para não cansar o músculo principal. Você prefere esteira ou bicicleta?"
+                return "Excelente! Deixar o cardio para o final preserva sua força para os pesos. Você prefere corrida ou escada?"
+            self.contexto = "esperando_tipo_cardio"
+            return "Entendido. Um cardio leve antes serve como aquecimento. Você prefere esteira ou bicicleta?"
 
-        if self.contexto == "esperando_proteina":
-            # Verificamos palavras positivas ou negativas
-            if any(w in palavras for w in ["sim", "bato", "faço", "faco", "durmo", "sim"]):
-                self.contexto = None # Reseta o contexto após concluir o fluxo
-                return "Perfeito! A constância no descanso e na dieta é o segredo. Você toma whey protein ou consegue bater a meta só com comida sólida?"
-            elif any(w in palavras for w in ["não", "nao", "pouco", "dificuldade"]):
+        if self.contexto == "esperando_tipo_cardio":
+            self.contexto = "esperando_frequencia"
+            return "Boa escolha! E qual a frequência? Pretende fazer todo dia ou apenas 3 vezes na semana?"
+
+        if self.contexto == "esperando_frequencia":
+            self.contexto = None
+            return "Consistência é a chave! Quer que eu te indique um alimento termogênico para ajudar na queima?"
+
+        # Fluxo de Hipertrofia
+        if self.contexto == "esperando_sono":
+            if any(w in palavras for w in ["sim", "durmo", "7", "8", "tenho"]):
+                self.contexto = "esperando_meta_proteica"
+                return "Ótimo, o sono é onde ocorre a síntese proteica. E a dieta? Você consegue comer cerca de 2g de proteína por quilo de peso?"
+            self.contexto = "esperando_meta_proteica"
+            return "Tente dormir mais, o músculo cresce no descanso! Mas e a comida? Está batendo sua meta de proteínas?"
+
+        if self.contexto == "esperando_meta_proteica":
+            self.contexto = "foco_treino"
+            return "Entendi. Proteína é essencial. Qual seu foco de treino hoje: Peito, Costas ou Pernas?"
+
+        # Fluxo de Motivação
+        if self.contexto == "esperando_confirmacao_treino":
+            if any(w in palavras for w in ["sim", "quero", "topo", "bora", "vamos", "ok"]):
+                self.contexto = "tipo_treino_curto"
+                return "É assim que se fala! Vamos de um treino funcional de 15 minutos ou apenas um aeróbico intenso?"
+            self.contexto = None
+            return "Sem problemas. O descanso também é importante. Amanhã voltamos com tudo? Me avise se precisar de uma dica de alongamento!"
+
+        if self.contexto == "esperando_tipo_dor":
+            if "articulação" in palavras or "articulacao" in palavras or "osso" in palavras:
                 self.contexto = None
-                return "Muitos têm essa dificuldade! O sono regula hormônios como a grelina. Já pensou em ajustar sua rotina para dormir 30min a mais?"
+                return "Cuidado! Dor na articulação pode ser lesão. Recomendo gelo e repouso. Já pensou em procurar um fisioterapeuta?"
+            self.contexto = None
+            return "Se for muscular, é apenas o ácido lático e a regeneração. Já tomou bastante água hoje para ajudar na recuperação?"
 
-        # --- LÓGICA DE PALAVRAS-CHAVE (Se não houver contexto ou se o usuário mudar de assunto) ---
+        # Fluxo manter a saude
+        if self.contexto == "esperando_experiencia_saude":
+            if any(w in palavras for w in ["começando", "começando", "inicio", "sedentário", "parado"]):
+                self.contexto = "sugestao_leve"
+                return "O importante é o primeiro passo! Que tal começar com 30 minutos de caminhada 3x na semana? Acha que consegue conciliar na sua rotina?"
+            else:
+                self.contexto = "sugestao_avancada"
+                return "Que bom que já se movimenta! Para saúde geral, você foca mais em flexibilidade ou em força muscular?"
+
+        if self.contexto == "sugestao_leve":
+            if any(w in palavras for w in ["sim", "consigo", "claro", "topo"]):
+                self.contexto = None
+                return "Perfeito! Começar devagar evita lesões. Já tem um tênis confortável para essas caminhadas?"
+            self.contexto = None
+            return "Entendo. Se o tempo está curto, subir escadas em vez de usar o elevador já ajuda muito! Qual outra pequena mudança você poderia fazer hoje?"
+        
+        
+        # --- BUSCA POR INTENÇÕES (PROCURA PALAVRAS-CHAVE SE NÃO HOUVER CONTEXTO) ---
         for intent, dados in self.conhecimento.items():
             if any(key in palavras for key in dados["keywords"]):
-                self.contexto = dados.get("proximo_passo") # Salva o novo contexto
+                self.contexto = dados.get("proximo_passo")
                 return dados["resposta"]
         
-        # Fallback
-        return "Interessante! Não tenho certeza se entendi, mas adoraria saber mais. Você poderia detalhar como é sua rotina atual de exercícios?"
+        # Resposta padrão caso o bot se perca
+        return "Interessante! Não entendi perfeitamente, mas me conte: como está sua rotina de treinos ultimamente?"
