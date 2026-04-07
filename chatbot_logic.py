@@ -10,9 +10,9 @@ class AcademiaBot:
     def __init__(self):
         self.contexto = None 
         
-        # =========================================================
+         
         # BASE DE CONHECIMENTO COMPLETA (TODOS COM GANCHOS)
-        # =========================================================
+         
         self.conhecimento = {
             "saudacao": {
                 "keywords": ["ola", "olá", "oi", "bom dia", "boa tarde", "boa noite", "salve"],
@@ -75,10 +75,7 @@ class AcademiaBot:
 
     def gerar_resposta(self, mensagem_usuario):
         palavras = self.processar_texto(mensagem_usuario)
-        
-        # =========================================================
-        # ÁRVORE DE DIÁLOGO (TODOS OS NÓS COM GANCHOS!)
-        # =========================================================
+         
 
         # ---------------- 3. FLUXO: SAÚDE E BEM-ESTAR ----------------
         if self.contexto == "esperando_rotina_saude":
@@ -181,10 +178,7 @@ class AcademiaBot:
             else:
                 self.contexto = None
                 return "Compreensível, o descanso mental também importa. Não deixe que um dia ruim vire uma semana parada. Volte com tudo amanhã! Quer aproveitar o dia off para falarmos sobre estratégias de dieta?"
-
-        # =========================================================
-        # BUSCA INICIAL DE INTENÇÕES (FALLBACK PARA NOVO ASSUNTO)
-        # =========================================================
+         
         for intent, dados in self.conhecimento.items():
             if self.tem_palavra(palavras, dados["keywords"]):
                 self.contexto = dados.get("proximo_passo")
