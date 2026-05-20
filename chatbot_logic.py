@@ -2,11 +2,14 @@ import json
 import requests
 import nltk
 from nltk.tokenize import word_tokenize
+import os 
+from dotenv import load_dotenv
 import string
 
 class AcademiaBot:
     def __init__(self):
-        self.HF_TOKEN = ""
+        load_dotenv()
+        self.HF_TOKEN = os.getenv("HUGGINGFACE_TOKEN")
         self.HF_API_URL = "https://api-inference.huggingface.co/models/Qwen/Qwen2.5-7B-Instruct"
         
         # Carrega a base de dados (Json)
