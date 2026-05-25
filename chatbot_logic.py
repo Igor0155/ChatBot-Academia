@@ -2,15 +2,18 @@ import json
 import requests
 import nltk
 from nltk.tokenize import word_tokenize
+
 import os 
 from dotenv import load_dotenv
+
 import string
 
 class AcademiaBot:
     def __init__(self):
         load_dotenv()
         self.HF_TOKEN = os.getenv("HUGGINGFACE_TOKEN")
-        self.HF_API_URL = "https://api-inference.huggingface.co/models/Qwen/Qwen2.5-7B-Instruct"
+        self.HF_API_URL = "https://router.huggingface.co/v1/chat/completions"
+        self.MODEL = "Qwen/Qwen2.5-7B-Instruct:together"
         
         # Carrega a base de dados (Json)
         try:
@@ -38,27 +41,39 @@ class AcademiaBot:
         # O prompt para dá a personalidade de fitness à IA
         prompt = f"""Você é o FitBot, um personal trainer e nutricionista sênior.
         O usuário te fará uma pergunta complexa sobre treinos, fisiologia, biomecânica ou dieta.
-        Responda de forma científica, direta e sem inventar dados.
-        Usuário: {mensagem_usuario}
+        Responda de forma científica, direta, educada, sem inventar dados e direta (máximo 2 parágrafos). 
+        Deixe sempre uma pergunta para o usuário no final da resposta, para manter a conversa fluida.
         FitBot:"""
 
         payload = {
-            "inputs": prompt,
-            "parameters": {"max_new_tokens": 300, "temperature": 0.5} # Temperature baixa para respostas mais exatas
+            "model": self.MODEL,
+         "messages": [
+                {
+                    "role": "system",
+                    "content": prompt,
+                },
+                {
+                    "role": "user",
+                    "content": mensagem_usuario
+                }
+            ],
+            "max_tokens": 300,
+            "temperature": 0.5
         }
 
         try:
             response = requests.post(self.HF_API_URL, headers=headers, json=payload)
             response_data = response.json()
             
-            if type(response_data) == list and "generated_text" in response_data[0]:
-                texto_gerado = response_data[0]["generated_text"]
-                resposta_final = texto_gerado.split("FitBot:")[-1].strip()
+            if "choices" in response_data and len(response_data["choices"]) > 0:
+                resposta_final = response_data["choices"][0]["message"]["content"].strip()
                 return f"🧠 [FitBot IA] - {resposta_final}"
-            return "Erro na API. O modelo está indisponível no momento."
+            else:
+                # Retorna o erro exato da API para ajudar a debugar
+                return f"Erro na API do Hugging Face: {response_data}"
         
         except Exception as e:
-            return f"Erro de conexão: {str(e)}"
+            return f"Erro de conexão com o LLM: {str(e)}"
 
     def gerar_resposta(self, mensagem_usuario):
         palavras = self.processar_texto(mensagem_usuario)
