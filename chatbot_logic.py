@@ -28,11 +28,15 @@ class AcademiaBot:
         return [w for w in tokens if w not in string.punctuation]
 
     def consultar_base_conhecimento(self, palavras):
-        # Varre o JSON para buscar a relação mais próxima com as palavras-chave do usuário
+        texto_usuario = " ".join(palavras)
+        # 2. Varre o JSON
         for categoria, itens in self.base_dados.items():
             for chave, informacao in itens.items():
-                if chave in palavras:
+                tokens_chave = self.processar_texto(chave)
+                chave_limpa = " ".join(tokens_chave)
+                if chave_limpa and chave_limpa in texto_usuario:
                     return f"📚 [Base de Dados] - {chave.title()}:\n{informacao}"
+                
         return None
 
     def consultar_llm_fallback(self, mensagem_usuario):
