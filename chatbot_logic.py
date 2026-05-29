@@ -28,12 +28,9 @@ class AcademiaBot:
         return [w for w in tokens if w not in string.punctuation]
 
     def consultar_base_conhecimento(self, palavras):
-<<<<<<< HEAD
+
         texto_usuario = " ".join(palavras)
-        # 2. Varre o JSON
-=======
         # Varre o JSON para buscar a relação mais próxima com as palavras-chave do usuári
->>>>>>> 73371ead7a025fc79c574af601c5dcc2e4140d91
         for categoria, itens in self.base_dados.items():
             for chave, informacao in itens.items():
                 tokens_chave = self.processar_texto(chave)
