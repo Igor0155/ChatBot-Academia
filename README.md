@@ -27,7 +27,7 @@ Diferente de um chatbot baseado em regras rígidas, o FitBot utiliza processamen
 3. **Filtragem (Stopwords):** Remoção de palavras irrelevantes (como "de", "a", "o", "com") que não carregam significado semântico para o treino.
 4. **Mapeamento de Intenções:** O bot compara os tokens resultantes com um dicionário de conhecimentos especializado em academia.
 
-> **Diferencial Pedagógico:** O bot foi programado para nunca encerrar a interação com respostas secas. Todas as 500+ intenções mapeadas terminam com uma pergunta de engajamento, mantendo o fluxo da conversa ativo (Context-Aware Design).
+> **Diferencial Pedagógico:** O bot foi programado para nunca encerrar a interação com respostas secas. Todas as 1500+ intenções mapeadas terminam com uma pergunta de engajamento, mantendo o fluxo da conversa ativo (Context-Aware Design).
 
 ## Estrutura do Projeto
 
@@ -55,7 +55,7 @@ Diferente de um chatbot baseado em regras rígidas, o FitBot utiliza processamen
    Certifique-se de ter o Python instalado. Recomenda-se o uso de um ambiente virtual (`venv`).
 
 ```bash
-python -m venv venv
+python -m venv
 ```
 
 2. Instalação das Dependências
@@ -98,4 +98,4 @@ Após iniciar, acesse no navegador: `http://127.0.0.1:5000`
 
 - **Feedback Visual:** Implementação de um estado de "Digitando..." para simular uma interação humana e melhorar a UX (User Experience).
 
-- **Escalabilidade:** A lógica do bot foi separada em uma classe (AcademiaBot), facilitando a futura integração com bancos de dados ou APIs de IA generativa.
+- **Escalabilidade:** A lógica do bot foi separada em uma classe (AcademiaBot), facilitando a integração com bancos de dados ou APIs de IA generativa.
