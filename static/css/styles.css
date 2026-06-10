@@ -23,8 +23,8 @@ body {
 }
 
 .app-shell {
-  width: min(960px, calc(100vw - 1.5rem));
-  height: min(760px, calc(100vh - 1.5rem));
+  width: min(1060px, calc(100vw - 1.5rem));
+  height: min(860px, calc(100vh - 1.5rem));
   display: flex;
   flex-direction: column;
   border-radius: 16px;
@@ -102,6 +102,49 @@ body {
   align-self: flex-end;
   background: linear-gradient(135deg, #4f7ffc, #2f5fdb);
   color: white;
+}
+
+.message-time {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.message-text table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.message-text th,
+.message-text td {
+  border: 1px solid #555;
+  padding: 8px;
+  text-align: left;
+}
+
+.message-text th {
+  background: #2f3c45;
+}
+
+.message-text tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.message-text h1,
+.message-text h2,
+.message-text h3,
+.message-text h4 {
+  margin-top: 12px;
+  margin-bottom: 8px;
+  color: #ffb300;
+}
+.message-text ul,
+.message-text ol {
+  padding-left: 20px;
+}
+
+.message-text li {
+  margin-bottom: 5px;
 }
 
 .message.bot {

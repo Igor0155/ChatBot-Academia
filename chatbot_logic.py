@@ -15,6 +15,9 @@ class AcademiaBot:
         self.HF_API_URL = "https://router.huggingface.co/v1/chat/completions"
         self.MODEL = "Qwen/Qwen2.5-7B-Instruct:together"
         
+        # Guarda o historico da conversa...
+        self.historico = []
+        
         # Carrega a base de dados (Json)
         try:
             with open('base_conhecimento.json', 'r', encoding='utf-8') as f:
@@ -41,28 +44,33 @@ class AcademiaBot:
 
     def consultar_llm_fallback(self, mensagem_usuario):
         headers = {"Authorization": f"Bearer {self.HF_TOKEN}"}
-        
+
         # O prompt para dá a personalidade de fitness à IA
-        prompt = f"""Você é o FitBot, um personal trainer e nutricionista sênior.
-        O usuário te fará uma pergunta complexa sobre treinos, fisiologia, biomecânica ou dieta.
-        Responda de forma científica, educada, sem inventar dados e direta (máximo 2 parágrafos). 
-        Deixe sempre uma pergunta para o usuário no final da resposta, para manter a conversa fluida.
-        FitBot:"""
+        with open("fitbot_prompt.txt", "r", encoding="utf-8") as f:
+            prompt =  f.read()
+
+        # Cria a mensagem para o LLM com:
+        # Hitórico da conversa
+        # Mensagem do usuário
+        mensagem = [{
+            "role": "system",
+            "content": prompt
+        }]
+
+        # limitando hitorico
+        self.historico = self.historico[-10:]
+
+        mensagem.extend(self.historico)
+        mensagem.append({
+            "role": "user",
+            "content": mensagem_usuario
+        })
 
         payload = {
             "model": self.MODEL,
-         "messages": [
-                {
-                    "role": "system",
-                    "content": prompt,
-                },
-                {
-                    "role": "user",
-                    "content": mensagem_usuario
-                }
-            ],
-            "max_tokens": 300,
-            "temperature": 0.5
+            "messages": mensagem,
+            #"max_tokens": 512,
+            "temperature": 0.2
         }
 
         try:
@@ -71,6 +79,17 @@ class AcademiaBot:
             
             if "choices" in response_data and len(response_data["choices"]) > 0:
                 resposta_final = response_data["choices"][0]["message"]["content"].strip()
+
+                # Adiciona a pergunta do usuário e resposta ao histórico
+                self.historico.append({
+                    "role": "user",
+                    "content": mensagem_usuario
+                })
+                self.historico.append({
+                    "role": "assistant",
+                    "content": resposta_final
+                })
+
                 return f"🧠 [FitBot IA] - {resposta_final}"
             else:
                 # Retorna o erro exato da API para ajudar a debugar
